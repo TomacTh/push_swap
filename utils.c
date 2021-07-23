@@ -6,7 +6,7 @@
 /*   By: tcharvet <tcharvet@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/14 17:06:02 by tcharvet          #+#    #+#             */
-/*   Updated: 2021/07/22 19:31:24 by tcharvet         ###   ########.fr       */
+/*   Updated: 2021/07/23 16:40:38 by tcharvet         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -462,7 +462,6 @@ int	insert_sort(int *tab, unsigned int len)
 	return (0);
 }
 
-
 void	add_to_tab(int *tab, t_list *el)
 {	
 	unsigned int i;
@@ -510,12 +509,78 @@ void	reset_lst_tag(t_list *el)
 	}
 }
 
+int		is_sorted(t_stack *a, t_stack *b)
+{
+	t_list *el;
+
+	el = a->list;
+	if(b->len)
+		return (0);
+	while(el && el->next)
+	{
+		if(el->value < el->next->value)
+			el = el->next;
+		else
+			return (0);
+	}
+	return (1);
+}
+
+int		max(int a, int b, int c)
+{
+	if(a > b && a > c)
+		return (a);
+	else if(b > c && b > a)
+		return (b);
+	return (c);
+}
+void	sort_three_elements_in_a(t_stack *a, int *command_code)
+{
+	int	first;
+	int	second;
+	int	third;
+	int biggest;
+
+	first = a->list->value;
+	second = a->list->next->value;
+	third  = a->list->next->next->value;
+	biggest = max(first, second, third);
+	if(biggest != third)
+	{
+		if(first == biggest)
+			ra(a, command_code);
+		else
+			rra(a, command_code);
+	}
+	if(a->list->value > a->list->next->value)
+		sa(a, command_code);
+}
+
+void	sorting_three_or_two(t_push_swap *program)
+{
+	if(program->total <= 3)
+	{
+		if(program->total == 2)
+			sa(program->a, &	program->command_code);
+		else
+			sort_three_elements_in_a(program->a, &program->command_code);
+		quit(program, 0);
+	}
+}
+
+void	sorting(t_push_swap *program)
+{
+	sorting_three_or_two(program);
+}
+
 void	init_program(int ac, char **av, t_push_swap *program)
 {	
 	check_and_add_args(ac, av, program);
 	init_and_sort_tab(program->total, program);
 	replace_lst_value_by_index(program->a->list, program->sort_tab);
 	reset_lst_tag(program->a->list);
+	if(is_sorted(program->a, program->b))
+		quit(program,0);	
 }
 
 void	init_struct_addresses(t_push_swap *program, t_stack *a, t_stack *b)
@@ -528,21 +593,16 @@ void	init_struct_addresses(t_push_swap *program, t_stack *a, t_stack *b)
 }
 
 int main(int ac, char **av)
-{	
-	int tab[5] = {4, 0, 2, 1, 3};
+{
 
-	insert_sort(tab, 5);
+
 	t_push_swap	program;
 	t_stack		a;
 	t_stack		b;
 
 	init_struct_addresses(&program, &a, &b);
 	init_program(ac, av, &program);
-	
-	int arr[5];
-
-	arr[0] = 1;
-
+	sorting(&program);
 	return (0);
 }
 //run 45 -1000 0 9 -1 45 7812 448
